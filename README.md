@@ -1,3 +1,2 @@
 # AVL-Trees
-Implemenation of Maps/Set 
-How they are Implemented Internally using AVL tree
+Implemenation of TreeMaps/TreeSet using AVL tree . It have Functionalities like Add , Remove , Search & All these are done in O(log N)
