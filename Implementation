@@ -1,0 +1,146 @@
+//AVL TREE Implementation
+//We can Add,Remove,Search --> O(log N)
+
+#include<bits/stdc++.h> 
+using namespace std; 
+
+      class Node{
+        public:
+          int data=0;
+          Node *left=NULL,*right=NULL;
+          //bal= lh-rh;
+          int height=0,bal=0;
+          Node(int val){
+              this->data=val;
+          }
+          Node(){}
+      };
+    
+      void updateHeightAndBalance(Node *node){
+          int lh=-1,rh=-1;
+          if(node->left)lh=node->left->height;
+          if(node->right)rh=node->right->height;
+          
+          int bal=lh-rh;
+          int height=max(lh,rh)+1;
+          
+          node->height=height;
+          node->bal=bal;
+      }
+    
+      Node*  rightRotation(Node * A){
+           Node* B=A->left;
+           Node* Bright=B->right;
+          
+           B->right=A;
+           A->left=Bright;
+           
+           updateHeightAndBalance(A);
+           updateHeightAndBalance(B);
+           
+           return B;
+      }
+      
+      Node* leftRotation(Node* A){
+           Node* B=A->right;
+           Node* Bleft=B->left;
+          
+           B->left=A;
+           A->right=Bleft;
+           
+           updateHeightAndBalance(A);
+           updateHeightAndBalance(B);
+          
+           return B;
+      }
+    
+      Node* getRotation(Node* node){
+          updateHeightAndBalance(node);
+          if(node->bal==2){  //LL,LR
+              if(node->left->bal==1){//LL
+                   return rightRotation(node);
+              }
+              else if(node->left->bal==-1){//LR
+                   node->left=leftRotation(node->left);
+                   return rightRotation(node);
+              }
+          }
+          else if(node->bal==-2){//RL,RR
+              if(node->right->bal==-1){//RR
+                   return leftRotation(node);
+              }
+              else if(node->right->bal==-1){//RL 
+                   node->right=rightRotation(node->right);
+                   return leftRotation(node);
+              }
+          }
+          return node;
+      }
+      
+      Node* addData(Node* root,int val){
+          if(root==NULL)return new Node(val);    
+          if(val<root->data)root->left=addData(root->left,val);
+          else root->right=addData(root->right,val);
+          
+          root=getRotation(root);
+          return root;
+      } 
+    
+      void display(Node * node){
+          if(!node)return;
+          string s;
+          s+=node->left?to_string(node->left->data):".";
+          s+="<- "+to_string(node->data)+" ->";
+          s+=node->right?to_string(node->right->data):".";
+          cout<<s<<endl;
+          
+          display(node->left);
+          display(node->right);
+      }
+      
+      Node* getMaxNode(Node* node){
+          Node* curr=node;
+          while(curr->right)curr=curr->right;
+          return curr;
+      }
+
+      Node* removeData(Node* node,int val ){
+          if(node==NULL)return NULL;
+          if(val<node->data)node->left=removeData(node->left,val);
+          else if(val>node->data)node->right=removeData(node->right,val);
+          else if(val==node->data){
+              if(node->left==NULL || node->right==NULL)
+                  return node->left?node->left:node->right;
+              
+              Node* maxNode=getMaxNode(node->left);
+              node->data=maxNode->data;
+              node->left=removeData(node->left,maxNode->data);
+          }
+          node=getRotation(node);
+          return node;
+      }
+
+       int search(Node* root,int val){
+          if(root==NULL)return 0;  
+          if(root->data==val)return 1; 
+          return search(root->left,val)||search(root->right,val);
+      } 
+
+int main(){
+    Node* root=NULL;
+    int a[10]={10,20,30,40,50,60,70,80,90,100};
+    for(int i=0;i<10;i++)root=addData(root,a[i]);
+    display(root);
+    
+    cout<<endl<<search(root,20)<<endl;
+    cout<<search(root,25)<<endl<<endl;
+    
+    cout<<"---------------------------------------------------------->"<<endl;
+    for(int i=9;i>=0;i--){
+        root=removeData(root,a[i]);
+        display(root);
+        cout<<"======================================================>"<<endl;
+    }
+        
+    return 0;
+}
